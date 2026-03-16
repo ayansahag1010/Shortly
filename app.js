@@ -1,256 +1,127 @@
-// ============================================
-// Shortly — Enhanced Frontend URL Shortener
-// 10-Feature Upgrade
-// ============================================
+var form = document.getElementById('shortenForm');
+var urlInput = document.getElementById('urlInput');
+var result = document.getElementById('result');
+var shortLink = document.getElementById('shortLink');
+var copyBtn = document.getElementById('copyBtn');
+var openBtn = document.getElementById('openBtn');
+var qrBtn = document.getElementById('qrBtn');
+var qrModal = document.getElementById('qrModal');
+var qrImg = document.getElementById('qrImg');
+var qrUrl = document.getElementById('qrUrl');
+var qrClose = document.getElementById('qrClose');
+var downloadQr = document.getElementById('downloadQr');
+var submitBtn = document.getElementById('submitBtn');
+var toast = document.getElementById('toast');
+var themeToggle = document.getElementById('themeToggle');
+var themeIcon = document.getElementById('themeIcon');
+var urlPreview = document.getElementById('urlPreview');
+var cleaningOptions = document.getElementById('cleaningOptions');
+var cleanedPreview = document.getElementById('cleanedPreview');
+var safetyWarning = document.getElementById('safetyWarning');
+var safetyReason = document.getElementById('safetyReason');
+var cancelShorten = document.getElementById('cancelShorten');
+var continueShorten = document.getElementById('continueShorten');
+var bulkForm = document.getElementById('bulkForm');
+var bulkInput = document.getElementById('bulkInput');
+var bulkSubmitBtn = document.getElementById('bulkSubmitBtn');
+var bulkResults = document.getElementById('bulkResults');
+var bulkList = document.getElementById('bulkList');
+var bulkCount = document.getElementById('bulkCount');
+var screenshotImg = document.getElementById('screenshotImg');
+var screenshotPreview = document.getElementById('screenshotPreview');
+var clipboardPopup = document.getElementById('clipboardPopup');
+var clipboardAccept = document.getElementById('clipboardAccept');
+var clipboardDismiss = document.getElementById('clipboardDismiss');
+var clipboardText = document.getElementById('clipboardText');
+var dropOverlay = document.getElementById('dropOverlay');
+var qrColor = document.getElementById('qrColor');
+var qrBg = document.getElementById('qrBg');
+var qrSize = document.getElementById('qrSize');
+var qrSizeLabel = document.getElementById('qrSizeLabel');
 
-// ============================================
-// DOM ELEMENTS
-// ============================================
-const form = document.getElementById('shortenForm');
-const urlInput = document.getElementById('urlInput');
-const result = document.getElementById('result');
-const shortLink = document.getElementById('shortLink');
-const copyBtn = document.getElementById('copyBtn');
-const openBtn = document.getElementById('openBtn');
-const qrBtn = document.getElementById('qrBtn');
-const qrModal = document.getElementById('qrModal');
-const qrImg = document.getElementById('qrImg');
-const qrUrl = document.getElementById('qrUrl');
-const qrClose = document.getElementById('qrClose');
-const downloadQr = document.getElementById('downloadQr');
-const submitBtn = document.getElementById('submitBtn');
-const toast = document.getElementById('toast');
+var currentShortUrl = '';
+var currentLongUrl = '';
+var cleanedUrl = '';
+var safetyCheckPassed = false;
 
-// New feature elements
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon = document.getElementById('themeIcon');
-const urlPreview = document.getElementById('urlPreview');
-const cleaningOptions = document.getElementById('cleaningOptions');
-const cleanedPreview = document.getElementById('cleanedPreview');
-const safetyWarning = document.getElementById('safetyWarning');
-const safetyReason = document.getElementById('safetyReason');
-const cancelShorten = document.getElementById('cancelShorten');
-const continueShorten = document.getElementById('continueShorten');
-const bulkForm = document.getElementById('bulkForm');
-const bulkInput = document.getElementById('bulkInput');
-const bulkSubmitBtn = document.getElementById('bulkSubmitBtn');
-const bulkResults = document.getElementById('bulkResults');
-const bulkList = document.getElementById('bulkList');
-const bulkCount = document.getElementById('bulkCount');
-const screenshotImg = document.getElementById('screenshotImg');
-const screenshotPreview = document.getElementById('screenshotPreview');
-const clipboardPopup = document.getElementById('clipboardPopup');
-const clipboardAccept = document.getElementById('clipboardAccept');
-const clipboardDismiss = document.getElementById('clipboardDismiss');
-const clipboardText = document.getElementById('clipboardText');
-const dropOverlay = document.getElementById('dropOverlay');
-
-// QR customization
-const qrColor = document.getElementById('qrColor');
-const qrBg = document.getElementById('qrBg');
-const qrSize = document.getElementById('qrSize');
-const qrSizeLabel = document.getElementById('qrSizeLabel');
-
-// State
-let currentShortUrl = '';
-let currentLongUrl = '';
-let cleanedUrl = '';
-let safetyCheckPassed = false;
-
-// ============================================
-// 1. TOAST NOTIFICATION (existing, preserved)
-// ============================================
-function showToast(message, type) {
-  toast.textContent = message;
+// Toast
+function showToast(msg, type) {
+  toast.textContent = msg;
   toast.className = 'toast ' + type + ' show';
-  setTimeout(function () {
-    toast.classList.remove('show');
-  }, 3000);
+  setTimeout(function() { toast.classList.remove('show'); }, 3000);
 }
 
-// ============================================
-// 2. LOADING STATE (existing, preserved)
-// ============================================
-function setLoading(isLoading) {
-  submitBtn.disabled = isLoading;
-  submitBtn.innerHTML = isLoading
-    ? '<i class="fas fa-spinner fa-spin"></i> Shortening...'
-    : '<i class="fas fa-magic"></i> Shorten URL';
+// Loading state
+function setLoading(on) {
+  submitBtn.disabled = on;
+  submitBtn.innerHTML = on
+    ? '<span class="btn-content"><i class="fas fa-spinner fa-spin"></i> Shortening...</span>'
+    : '<span class="btn-content"><i class="fas fa-wand-magic-sparkles"></i> Shorten URL</span>';
 }
 
-// ============================================
-// FEATURE 6: DARK MODE TOGGLE
-// ============================================
+// Dark mode
 function initTheme() {
   var saved = localStorage.getItem('shortly-theme') || 'light';
   document.documentElement.setAttribute('data-theme', saved);
-  updateThemeIcon(saved);
+  themeIcon.className = saved === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
 }
 
-function updateThemeIcon(theme) {
-  themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-}
-
-themeToggle.addEventListener('click', function () {
-  var current = document.documentElement.getAttribute('data-theme');
-  var next = current === 'dark' ? 'light' : 'dark';
+themeToggle.addEventListener('click', function() {
+  var cur = document.documentElement.getAttribute('data-theme');
+  var next = cur === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('shortly-theme', next);
-  updateThemeIcon(next);
+  themeIcon.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
 });
 
-// ============================================
-// FEATURE 1: SMART URL PREVIEW
-// ============================================
-var platformPatterns = [
-  {
-    name: 'YouTube',
-    icon: 'fab fa-youtube',
-    cssClass: 'youtube',
-    pattern: /(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/,
-    getThumb: function (match) {
-      return 'https://img.youtube.com/vi/' + match[1] + '/hqdefault.jpg';
-    },
-    getDetail: function (match) {
-      return 'Video ID: ' + match[1];
-    }
-  },
-  {
-    name: 'Instagram',
-    icon: 'fab fa-instagram',
-    cssClass: 'instagram',
-    pattern: /instagram\.com\/(p|reel|stories)\/([\w-]+)/,
-    getDetail: function (match) {
-      return match[1].charAt(0).toUpperCase() + match[1].slice(1) + ': ' + match[2];
-    }
-  },
-  {
-    name: 'Twitter / X',
-    icon: 'fab fa-x-twitter',
-    cssClass: 'twitter',
-    pattern: /(?:twitter\.com|x\.com)\/([\w]+)\/status\/(\d+)/,
-    getDetail: function (match) {
-      return '@' + match[1] + ' — Tweet ' + match[2];
-    }
-  },
-  {
-    name: 'Amazon',
-    icon: 'fab fa-amazon',
-    cssClass: 'amazon',
-    pattern: /amazon\.\w+\/.*(?:dp|product)\/([\w]+)/,
-    getDetail: function (match) {
-      return 'Product: ' + match[1];
-    }
-  },
-  {
-    name: 'GitHub',
-    icon: 'fab fa-github',
-    cssClass: 'github',
-    pattern: /github\.com\/([\w-]+)\/([\w.-]+)/,
-    getDetail: function (match) {
-      return match[1] + '/' + match[2];
-    }
-  },
-  {
-    name: 'LinkedIn',
-    icon: 'fab fa-linkedin',
-    cssClass: 'linkedin',
-    pattern: /linkedin\.com\/(?:in|company)\/([\w-]+)/,
-    getDetail: function (match) {
-      return 'Profile: ' + match[1];
-    }
-  },
-  {
-    name: 'Reddit',
-    icon: 'fab fa-reddit',
-    cssClass: 'reddit',
-    pattern: /reddit\.com\/r\/([\w]+)/,
-    getDetail: function (match) {
-      return 'r/' + match[1];
-    }
-  }
+// Platform detection
+var platforms = [
+  { name:'YouTube', icon:'fab fa-youtube', css:'youtube', re:/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/, thumb:function(m){return 'https://img.youtube.com/vi/'+m[1]+'/hqdefault.jpg'}, detail:function(m){return 'Video ID: '+m[1]} },
+  { name:'Instagram', icon:'fab fa-instagram', css:'instagram', re:/instagram\.com\/(p|reel|stories)\/([\w-]+)/, detail:function(m){return m[1].charAt(0).toUpperCase()+m[1].slice(1)+': '+m[2]} },
+  { name:'Twitter / X', icon:'fab fa-x-twitter', css:'twitter', re:/(?:twitter\.com|x\.com)\/([\w]+)\/status\/(\d+)/, detail:function(m){return '@'+m[1]+' — Tweet '+m[2]} },
+  { name:'Amazon', icon:'fab fa-amazon', css:'amazon', re:/amazon\.\w+\/.*(?:dp|product)\/([\w]+)/, detail:function(m){return 'Product: '+m[1]} },
+  { name:'GitHub', icon:'fab fa-github', css:'github', re:/github\.com\/([\w-]+)\/([\w.-]+)/, detail:function(m){return m[1]+'/'+m[2]} },
+  { name:'LinkedIn', icon:'fab fa-linkedin', css:'linkedin', re:/linkedin\.com\/(?:in|company)\/([\w-]+)/, detail:function(m){return 'Profile: '+m[1]} },
+  { name:'Reddit', icon:'fab fa-reddit', css:'reddit', re:/reddit\.com\/r\/([\w]+)/, detail:function(m){return 'r/'+m[1]} }
 ];
-
-function detectPlatform(url) {
-  for (var i = 0; i < platformPatterns.length; i++) {
-    var p = platformPatterns[i];
-    var match = url.match(p.pattern);
-    if (match) return { platform: p, match: match };
-  }
-  return null;
-}
 
 function showUrlPreview(url) {
-  var detection = detectPlatform(url);
-  if (!detection) {
-    urlPreview.classList.add('hidden');
-    return;
+  for (var i = 0; i < platforms.length; i++) {
+    var p = platforms[i];
+    var m = url.match(p.re);
+    if (m) {
+      var thumbHtml = p.thumb ? '<img class="preview-thumb" src="'+p.thumb(m)+'" alt="Preview"/>' : '';
+      urlPreview.innerHTML = '<div class="preview-icon '+p.css+'"><i class="'+p.icon+'"></i></div><div class="preview-info"><div class="preview-platform">'+p.name+'</div><div class="preview-detail">'+p.detail(m)+'</div></div>'+thumbHtml;
+      urlPreview.classList.remove('hidden');
+      return;
+    }
   }
-
-  var p = detection.platform;
-  var m = detection.match;
-  var thumbHtml = '';
-
-  if (p.getThumb) {
-    thumbHtml = '<img class="preview-thumb" src="' + p.getThumb(m) + '" alt="Preview" />';
-  }
-
-  urlPreview.innerHTML =
-    '<div class="preview-icon ' + p.cssClass + '">' +
-      '<i class="' + p.icon + '"></i>' +
-    '</div>' +
-    '<div class="preview-info">' +
-      '<div class="preview-platform">' + p.name + '</div>' +
-      '<div class="preview-detail">' + p.getDetail(m) + '</div>' +
-    '</div>' + thumbHtml;
-
-  urlPreview.classList.remove('hidden');
+  urlPreview.classList.add('hidden');
 }
 
-// Listen for input changes to show preview
-urlInput.addEventListener('input', function () {
+urlInput.addEventListener('input', function() {
   var url = urlInput.value.trim();
-  if (url) {
-    showUrlPreview(url);
-    checkTrackingParams(url);
-  } else {
-    urlPreview.classList.add('hidden');
-    cleaningOptions.classList.add('hidden');
-  }
+  if (url) { showUrlPreview(url); checkTracking(url); }
+  else { urlPreview.classList.add('hidden'); cleaningOptions.classList.add('hidden'); }
 });
 
-// ============================================
-// FEATURE 3: URL CLEANING
-// ============================================
-var trackingParams = [
-  'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
-  'fbclid', 'gclid', 'gclsrc', 'dclid', 'msclkid',
-  'mc_cid', 'mc_eid', 'ref', '_ga', 'yclid'
-];
+// URL cleaning
+var trackParams = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','fbclid','gclid','gclsrc','dclid','msclkid','mc_cid','mc_eid','ref','_ga','yclid'];
 
 function cleanUrl(url) {
   try {
-    var parsed = new URL(url);
-    var removed = [];
-    trackingParams.forEach(function (param) {
-      if (parsed.searchParams.has(param)) {
-        removed.push(param);
-        parsed.searchParams.delete(param);
-      }
-    });
-    return { cleaned: parsed.toString(), removed: removed };
-  } catch (e) {
-    return { cleaned: url, removed: [] };
-  }
+    var u = new URL(url); var removed = [];
+    trackParams.forEach(function(p) { if (u.searchParams.has(p)) { removed.push(p); u.searchParams.delete(p); } });
+    return { cleaned: u.toString(), removed: removed };
+  } catch(e) { return { cleaned: url, removed: [] }; }
 }
 
-function checkTrackingParams(url) {
-  var result = cleanUrl(url);
-  if (result.removed.length > 0) {
-    cleanedUrl = result.cleaned;
-    cleanedPreview.textContent = '(removes: ' + result.removed.join(', ') + ')';
+function checkTracking(url) {
+  var r = cleanUrl(url);
+  if (r.removed.length > 0) {
+    cleanedUrl = r.cleaned;
+    cleanedPreview.textContent = '(removes: ' + r.removed.join(', ') + ')';
     cleaningOptions.classList.remove('hidden');
-    // Default to original
     document.querySelector('input[name="urlChoice"][value="original"]').checked = true;
   } else {
     cleanedUrl = '';
@@ -259,89 +130,39 @@ function checkTrackingParams(url) {
 }
 
 function getSelectedUrl() {
-  var choice = document.querySelector('input[name="urlChoice"]:checked');
-  if (choice && choice.value === 'cleaned' && cleanedUrl) {
-    return cleanedUrl;
-  }
-  return urlInput.value.trim();
+  var c = document.querySelector('input[name="urlChoice"]:checked');
+  return (c && c.value === 'cleaned' && cleanedUrl) ? cleanedUrl : urlInput.value.trim();
 }
 
-// ============================================
-// FEATURE 2: MALWARE / PHISHING DETECTION
-// ============================================
-var suspiciousTLDs = ['.tk', '.ml', '.ga', '.cf', '.gq', '.xyz', '.top', '.buzz', '.work'];
-var suspiciousKeywords = ['login', 'signin', 'verify', 'secure', 'account', 'update', 'confirm', 'banking', 'password', 'wallet'];
+// Safety check
+var badTLDs = ['.tk','.ml','.ga','.cf','.gq','.xyz','.top','.buzz','.work'];
+var badWords = ['login','signin','verify','secure','account','update','confirm','banking','password','wallet'];
 
-function checkUrlSafety(url) {
+function checkSafety(url) {
   var reasons = [];
-
   try {
-    var parsed = new URL(url);
-    var hostname = parsed.hostname.toLowerCase();
-
-    // Check: IP-based URL
-    if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname)) {
-      reasons.push('URL uses a raw IP address instead of a domain name');
-    }
-
-    // Check: suspicious TLD
-    for (var i = 0; i < suspiciousTLDs.length; i++) {
-      if (hostname.endsWith(suspiciousTLDs[i])) {
-        reasons.push('Uses a frequently abused domain extension (' + suspiciousTLDs[i] + ')');
-        break;
-      }
-    }
-
-    // Check: deceptive subdomain (e.g., google.com.evil.tk)
-    var parts = hostname.split('.');
+    var u = new URL(url); var h = u.hostname.toLowerCase();
+    if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(h)) reasons.push('URL uses a raw IP address');
+    for (var i = 0; i < badTLDs.length; i++) if (h.endsWith(badTLDs[i])) { reasons.push('Frequently abused domain extension ('+badTLDs[i]+')'); break; }
+    var parts = h.split('.');
     if (parts.length > 3) {
-      var knownBrands = ['google', 'facebook', 'apple', 'microsoft', 'amazon', 'paypal', 'netflix'];
-      for (var j = 0; j < knownBrands.length; j++) {
-        if (parts[0] === knownBrands[j] || parts[1] === knownBrands[j]) {
-          if (!hostname.endsWith(knownBrands[j] + '.com')) {
-            reasons.push('Suspicious subdomain impersonating ' + knownBrands[j]);
-            break;
-          }
-        }
-      }
+      var brands = ['google','facebook','apple','microsoft','amazon','paypal','netflix'];
+      for (var j = 0; j < brands.length; j++) if ((parts[0]===brands[j]||parts[1]===brands[j]) && !h.endsWith(brands[j]+'.com')) { reasons.push('Suspicious subdomain impersonating '+brands[j]); break; }
     }
-
-    // Check: suspicious keywords in path
-    var pathLower = parsed.pathname.toLowerCase() + parsed.search.toLowerCase();
-    for (var k = 0; k < suspiciousKeywords.length; k++) {
-      if (pathLower.includes(suspiciousKeywords[k]) && hostname.indexOf(suspiciousKeywords[k]) === -1) {
-        reasons.push('Contains suspicious keyword: "' + suspiciousKeywords[k] + '"');
-        break;
-      }
-    }
-
-    // Check: very long URL (common in phishing)
-    if (url.length > 500) {
-      reasons.push('Unusually long URL (common in phishing attacks)');
-    }
-
-  } catch (e) {
-    reasons.push('Invalid or malformed URL');
-  }
-
+    var path = (u.pathname + u.search).toLowerCase();
+    for (var k = 0; k < badWords.length; k++) if (path.includes(badWords[k]) && h.indexOf(badWords[k])===-1) { reasons.push('Suspicious keyword: "'+badWords[k]+'"'); break; }
+    if (url.length > 500) reasons.push('Unusually long URL');
+  } catch(e) { reasons.push('Invalid URL'); }
   return reasons;
 }
 
-// ============================================
-// FORM SUBMIT (upgraded with safety + cleaning)
-// ============================================
-form.addEventListener('submit', async function (e) {
+// Form submit
+form.addEventListener('submit', async function(e) {
   e.preventDefault();
   var longUrl = getSelectedUrl();
-
-  if (!longUrl) {
-    showToast('Please enter a URL', 'error');
-    return;
-  }
-
-  // Safety check
+  if (!longUrl) { showToast('Please enter a URL', 'error'); return; }
   if (!safetyCheckPassed) {
-    var issues = checkUrlSafety(longUrl);
+    var issues = checkSafety(longUrl);
     if (issues.length > 0) {
       safetyReason.textContent = issues.join('. ') + '.';
       safetyWarning.classList.remove('hidden');
@@ -349,383 +170,176 @@ form.addEventListener('submit', async function (e) {
       return;
     }
   }
-
-  // Reset safety state
   safetyCheckPassed = false;
   safetyWarning.classList.add('hidden');
   submitBtn.classList.remove('hidden');
-
   await shortenUrl(longUrl);
 });
 
-// Safety warning buttons
-cancelShorten.addEventListener('click', function () {
+cancelShorten.addEventListener('click', function() {
   safetyWarning.classList.add('hidden');
   submitBtn.classList.remove('hidden');
   safetyCheckPassed = false;
 });
 
-continueShorten.addEventListener('click', async function () {
+continueShorten.addEventListener('click', async function() {
   safetyCheckPassed = true;
   safetyWarning.classList.add('hidden');
   submitBtn.classList.remove('hidden');
-  var longUrl = getSelectedUrl();
-  await shortenUrl(longUrl);
+  await shortenUrl(getSelectedUrl());
   safetyCheckPassed = false;
 });
 
-// Core shorten function (preserved + upgraded)
 async function shortenUrl(longUrl) {
   setLoading(true);
   currentLongUrl = longUrl;
-
   try {
-    var response = await fetch(
-      'https://tinyurl.com/api-create.php?url=' + encodeURIComponent(longUrl)
-    );
-
-    if (!response.ok) throw new Error('Failed to shorten URL');
-
-    var shortUrl = await response.text();
+    var resp = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(longUrl));
+    if (!resp.ok) throw new Error('Failed');
+    var shortUrl = await resp.text();
     currentShortUrl = shortUrl;
-
-    // Display result
     shortLink.href = shortUrl;
     shortLink.textContent = shortUrl;
     result.classList.remove('hidden');
-
-    // Website screenshot (Feature 9)
     screenshotImg.src = 'https://image.thum.io/get/width/600/' + encodeURIComponent(longUrl);
-    screenshotPreview.style.display = 'block';
-
-    // Set QR code with current customization settings
+    screenshotPreview.style.display = '';
     updateQrCode();
     qrUrl.textContent = shortUrl;
-
-    // Auto-copy
-    try {
-      await navigator.clipboard.writeText(shortUrl);
-      showToast('Short link created and copied!', 'success');
-    } catch (clipErr) {
-      showToast('Short link created!', 'success');
-    }
-
-    // Reset form
+    try { await navigator.clipboard.writeText(shortUrl); showToast('Link created and copied!', 'success'); }
+    catch(e) { showToast('Link created!', 'success'); }
     form.reset();
     urlPreview.classList.add('hidden');
     cleaningOptions.classList.add('hidden');
     urlInput.focus();
     result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-  } catch (error) {
-    console.error('Error:', error);
-    showToast('Failed to shorten URL. Please try again.', 'error');
-  } finally {
-    setLoading(false);
-  }
+  } catch(err) {
+    showToast('Failed to shorten URL. Try again.', 'error');
+  } finally { setLoading(false); }
 }
 
-// ============================================
-// FEATURE 4: BULK URL SHORTENER
-// ============================================
-var modeTabs = document.querySelectorAll('.mode-tab');
-
-modeTabs.forEach(function (tab) {
-  tab.addEventListener('click', function () {
-    var mode = tab.dataset.mode;
-    modeTabs.forEach(function (t) { t.classList.remove('active'); });
+// Mode tabs
+document.querySelectorAll('.tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
     tab.classList.add('active');
-
-    if (mode === 'bulk') {
-      form.classList.add('hidden');
-      bulkForm.classList.remove('hidden');
-      result.classList.add('hidden');
+    if (tab.dataset.mode === 'bulk') {
+      form.classList.add('hidden'); bulkForm.classList.remove('hidden'); result.classList.add('hidden');
     } else {
-      form.classList.remove('hidden');
-      bulkForm.classList.add('hidden');
-      bulkResults.classList.add('hidden');
+      form.classList.remove('hidden'); bulkForm.classList.add('hidden'); bulkResults.classList.add('hidden');
     }
   });
 });
 
-bulkSubmitBtn.addEventListener('click', async function () {
-  var lines = bulkInput.value.trim().split('\n').filter(function (line) {
-    return line.trim().length > 0;
-  });
-
-  if (lines.length === 0) {
-    showToast('Please enter at least one URL', 'error');
-    return;
-  }
-
-  if (lines.length > 10) {
-    showToast('Maximum 10 URLs at a time', 'warning');
-    return;
-  }
-
-  // Set loading
+// Bulk shortener
+bulkSubmitBtn.addEventListener('click', async function() {
+  var lines = bulkInput.value.trim().split('\n').filter(function(l){ return l.trim().length > 0; });
+  if (lines.length === 0) { showToast('Enter at least one URL', 'error'); return; }
+  if (lines.length > 10) { showToast('Maximum 10 URLs at a time', 'warning'); return; }
   bulkSubmitBtn.disabled = true;
-  bulkSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Shortening...';
+  bulkSubmitBtn.innerHTML = '<span class="btn-content"><i class="fas fa-spinner fa-spin"></i> Shortening...</span>';
   bulkList.innerHTML = '';
   bulkResults.classList.add('hidden');
-
-  var successCount = 0;
-
+  var count = 0;
   for (var i = 0; i < lines.length; i++) {
     var url = lines[i].trim();
     try {
-      var response = await fetch(
-        'https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url)
-      );
-      if (!response.ok) throw new Error('Failed');
-      var shortUrl = await response.text();
-      successCount++;
-
-      var item = document.createElement('div');
-      item.className = 'bulk-item';
-      item.innerHTML =
-        '<div class="bulk-index">' + (i + 1) + '</div>' +
-        '<a class="bulk-url" href="' + shortUrl + '" target="_blank">' + shortUrl + '</a>' +
-        '<button class="bulk-copy" data-url="' + shortUrl + '"><i class="fas fa-copy"></i> Copy</button>';
-      bulkList.appendChild(item);
-
-    } catch (err) {
-      var item = document.createElement('div');
-      item.className = 'bulk-item';
-      item.innerHTML =
-        '<div class="bulk-index" style="background:var(--error)">' + (i + 1) + '</div>' +
-        '<span style="color:var(--error);font-size:0.9rem">Failed: ' + url.substring(0, 40) + '...</span>';
-      bulkList.appendChild(item);
+      var resp = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url));
+      if (!resp.ok) throw new Error();
+      var short = await resp.text();
+      count++;
+      var el = document.createElement('div'); el.className = 'bulk-item';
+      el.innerHTML = '<div class="bulk-index">'+(i+1)+'</div><a class="bulk-url" href="'+short+'" target="_blank">'+short+'</a><button class="bulk-copy" data-url="'+short+'"><i class="fas fa-copy"></i> Copy</button>';
+      bulkList.appendChild(el);
+    } catch(e) {
+      var el = document.createElement('div'); el.className = 'bulk-item';
+      el.innerHTML = '<div class="bulk-index" style="background:var(--error)">'+(i+1)+'</div><span style="color:var(--error);font-size:.85rem">Failed: '+url.substring(0,40)+'...</span>';
+      bulkList.appendChild(el);
     }
   }
-
-  bulkCount.textContent = successCount;
+  bulkCount.textContent = count;
   bulkResults.classList.remove('hidden');
   bulkResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-  // Reset button
   bulkSubmitBtn.disabled = false;
-  bulkSubmitBtn.innerHTML = '<i class="fas fa-magic"></i> Shorten All URLs';
-
-  // Bulk copy event delegation
-  bulkList.addEventListener('click', function (e) {
-    var btn = e.target.closest('.bulk-copy');
-    if (btn) {
-      navigator.clipboard.writeText(btn.dataset.url);
-      showToast('Copied!', 'success');
-    }
-  });
-
-  showToast(successCount + ' links shortened!', 'success');
+  bulkSubmitBtn.innerHTML = '<span class="btn-content"><i class="fas fa-wand-magic-sparkles"></i> Shorten All</span>';
+  bulkList.addEventListener('click', function(e) { var btn = e.target.closest('.bulk-copy'); if (btn) { navigator.clipboard.writeText(btn.dataset.url); showToast('Copied!', 'success'); } });
+  showToast(count + ' links shortened!', 'success');
 });
 
-// ============================================
-// FEATURE 5: QR CODE CUSTOMIZATION
-// ============================================
+// QR customization
 function updateQrCode() {
   if (!currentShortUrl) return;
-  var color = qrColor.value.replace('#', '');
-  var bg = qrBg.value.replace('#', '');
-  var size = qrSize.value;
-  qrSizeLabel.textContent = size;
-
-  qrImg.src =
-    'https://api.qrserver.com/v1/create-qr-code/?data=' +
-    encodeURIComponent(currentShortUrl) +
-    '&size=' + size + 'x' + size +
-    '&color=' + color +
-    '&bgcolor=' + bg;
+  var c = qrColor.value.replace('#',''), b = qrBg.value.replace('#',''), s = qrSize.value;
+  qrSizeLabel.textContent = s;
+  qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?data='+encodeURIComponent(currentShortUrl)+'&size='+s+'x'+s+'&color='+c+'&bgcolor='+b;
 }
-
 qrColor.addEventListener('input', updateQrCode);
 qrBg.addEventListener('input', updateQrCode);
 qrSize.addEventListener('input', updateQrCode);
 
-// ============================================
-// EXISTING BUTTONS (preserved)
-// ============================================
-copyBtn.addEventListener('click', async function () {
-  await navigator.clipboard.writeText(currentShortUrl);
-  showToast('Copied to clipboard!', 'success');
-});
+// Buttons
+copyBtn.addEventListener('click', async function() { await navigator.clipboard.writeText(currentShortUrl); showToast('Copied!', 'success'); });
+openBtn.addEventListener('click', function() { window.open(currentShortUrl, '_blank'); });
+qrBtn.addEventListener('click', function() { updateQrCode(); qrModal.classList.add('show'); });
+qrClose.addEventListener('click', function() { qrModal.classList.remove('show'); });
+qrModal.addEventListener('click', function(e) { if (e.target.classList.contains('modal-backdrop')) qrModal.classList.remove('show'); });
 
-openBtn.addEventListener('click', function () {
-  window.open(currentShortUrl, '_blank');
-});
-
-qrBtn.addEventListener('click', function () {
-  updateQrCode();
-  qrModal.classList.add('show');
-});
-
-qrClose.addEventListener('click', function () {
-  qrModal.classList.remove('show');
-});
-
-qrModal.addEventListener('click', function (e) {
-  if (e.target.classList.contains('modal-overlay')) {
-    qrModal.classList.remove('show');
-  }
-});
-
-downloadQr.addEventListener('click', async function () {
+downloadQr.addEventListener('click', async function() {
   try {
-    var response = await fetch(qrImg.src);
-    var blob = await response.blob();
-    var url = URL.createObjectURL(blob);
-    var link = document.createElement('a');
-    link.download = 'shortly-qr-code.png';
-    link.href = url;
-    link.click();
-    URL.revokeObjectURL(url);
-    showToast('QR code downloaded!', 'success');
-  } catch (error) {
-    showToast('Failed to download QR code', 'error');
-  }
+    var resp = await fetch(qrImg.src); var blob = await resp.blob(); var u = URL.createObjectURL(blob);
+    var a = document.createElement('a'); a.download = 'shortly-qr.png'; a.href = u; a.click();
+    URL.revokeObjectURL(u); showToast('QR downloaded!', 'success');
+  } catch(e) { showToast('Download failed', 'error'); }
 });
 
-// ============================================
-// FEATURE 8: SOCIAL MEDIA SHARE BUTTONS
-// ============================================
-document.getElementById('shareWhatsApp').addEventListener('click', function () {
-  window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent('Check this out: ' + currentShortUrl), '_blank');
-});
+// Social sharing
+document.getElementById('shareWhatsApp').addEventListener('click', function() { window.open('https://api.whatsapp.com/send?text='+encodeURIComponent('Check this out: '+currentShortUrl),'_blank'); });
+document.getElementById('shareTwitter').addEventListener('click', function() { window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(currentShortUrl)+'&text='+encodeURIComponent('Check this out!'),'_blank'); });
+document.getElementById('shareTelegram').addEventListener('click', function() { window.open('https://t.me/share/url?url='+encodeURIComponent(currentShortUrl)+'&text='+encodeURIComponent('Check this out!'),'_blank'); });
+document.getElementById('shareLinkedIn').addEventListener('click', function() { window.open('https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(currentShortUrl),'_blank'); });
 
-document.getElementById('shareTwitter').addEventListener('click', function () {
-  window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(currentShortUrl) + '&text=' + encodeURIComponent('Check this out!'), '_blank');
-});
-
-document.getElementById('shareTelegram').addEventListener('click', function () {
-  window.open('https://t.me/share/url?url=' + encodeURIComponent(currentShortUrl) + '&text=' + encodeURIComponent('Check this out!'), '_blank');
-});
-
-document.getElementById('shareLinkedIn').addEventListener('click', function () {
-  window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(currentShortUrl), '_blank');
-});
-
-// ============================================
-// FEATURE 7: CLIPBOARD AUTO DETECTION
-// ============================================
-var clipboardUrl = '';
-
-async function checkClipboard() {
+// Clipboard detection
+var clipUrl = '';
+async function checkClip() {
   try {
-    var text = await navigator.clipboard.readText();
-    if (text && isValidUrl(text) && text.length > 20) {
-      clipboardUrl = text;
-      clipboardText.textContent = 'Paste: ' + text.substring(0, 35) + '...';
+    var t = await navigator.clipboard.readText();
+    if (t && isUrl(t) && t.length > 20) {
+      clipUrl = t;
+      clipboardText.textContent = 'Paste: ' + t.substring(0,35) + '...';
       clipboardPopup.classList.remove('hidden');
-
-      // Auto-dismiss after 6 seconds
-      setTimeout(function () {
-        clipboardPopup.classList.add('hidden');
-      }, 6000);
+      setTimeout(function() { clipboardPopup.classList.add('hidden'); }, 6000);
     }
-  } catch (e) {
-    // Clipboard access denied — silently ignore
-  }
+  } catch(e) {}
 }
+function isUrl(s) { try { var u = new URL(s); return u.protocol==='http:'||u.protocol==='https:'; } catch(e) { return false; } }
+clipboardAccept.addEventListener('click', function() { urlInput.value = clipUrl; clipboardPopup.classList.add('hidden'); showUrlPreview(clipUrl); checkTracking(clipUrl); showToast('URL pasted!', 'info'); });
+clipboardDismiss.addEventListener('click', function() { clipboardPopup.classList.add('hidden'); });
 
-function isValidUrl(str) {
-  try {
-    var url = new URL(str);
-    return url.protocol === 'http:' || url.protocol === 'https:';
-  } catch (e) {
-    return false;
-  }
-}
-
-clipboardAccept.addEventListener('click', function () {
-  urlInput.value = clipboardUrl;
-  clipboardPopup.classList.add('hidden');
-  showUrlPreview(clipboardUrl);
-  checkTrackingParams(clipboardUrl);
-  showToast('URL pasted from clipboard!', 'info');
-});
-
-clipboardDismiss.addEventListener('click', function () {
-  clipboardPopup.classList.add('hidden');
-});
-
-// ============================================
-// FEATURE 10: DRAG AND DROP URL INPUT
-// ============================================
-var dragCounter = 0;
-
-document.addEventListener('dragenter', function (e) {
-  e.preventDefault();
-  dragCounter++;
-  dropOverlay.classList.add('show');
-});
-
-document.addEventListener('dragleave', function (e) {
-  e.preventDefault();
-  dragCounter--;
-  if (dragCounter <= 0) {
-    dragCounter = 0;
-    dropOverlay.classList.remove('show');
-  }
-});
-
-document.addEventListener('dragover', function (e) {
-  e.preventDefault();
-});
-
-document.addEventListener('drop', function (e) {
-  e.preventDefault();
-  dragCounter = 0;
-  dropOverlay.classList.remove('show');
-
-  // Extract URL from dropped data
-  var droppedText = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain') || '';
-  droppedText = droppedText.trim();
-
-  if (droppedText && isValidUrl(droppedText)) {
-    // Switch to single mode if in bulk
-    modeTabs.forEach(function (t) { t.classList.remove('active'); });
+// Drag and drop
+var dragCount = 0;
+document.addEventListener('dragenter', function(e) { e.preventDefault(); dragCount++; dropOverlay.classList.add('show'); });
+document.addEventListener('dragleave', function(e) { e.preventDefault(); dragCount--; if (dragCount<=0) { dragCount=0; dropOverlay.classList.remove('show'); } });
+document.addEventListener('dragover', function(e) { e.preventDefault(); });
+document.addEventListener('drop', function(e) {
+  e.preventDefault(); dragCount=0; dropOverlay.classList.remove('show');
+  var txt = (e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain') || '').trim();
+  if (txt && isUrl(txt)) {
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
     document.querySelector('[data-mode="single"]').classList.add('active');
-    form.classList.remove('hidden');
-    bulkForm.classList.add('hidden');
-
-    urlInput.value = droppedText;
-    showUrlPreview(droppedText);
-    checkTrackingParams(droppedText);
-    urlInput.focus();
-    showToast('URL dropped!', 'info');
-  } else {
-    showToast('Please drop a valid URL', 'error');
-  }
+    form.classList.remove('hidden'); bulkForm.classList.add('hidden');
+    urlInput.value = txt; showUrlPreview(txt); checkTracking(txt); urlInput.focus(); showToast('URL dropped!', 'info');
+  } else { showToast('Drop a valid URL', 'error'); }
 });
-
-// Also support drag-drop directly on input
-urlInput.addEventListener('dragover', function (e) {
-  e.preventDefault();
-  urlInput.classList.add('drag-over');
-});
-
-urlInput.addEventListener('dragleave', function () {
+urlInput.addEventListener('dragover', function(e) { e.preventDefault(); urlInput.classList.add('drag-over'); });
+urlInput.addEventListener('dragleave', function() { urlInput.classList.remove('drag-over'); });
+urlInput.addEventListener('drop', function(e) {
   urlInput.classList.remove('drag-over');
+  var txt = (e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain') || '').trim();
+  if (txt && isUrl(txt)) { urlInput.value = txt; showUrlPreview(txt); checkTracking(txt); }
 });
 
-urlInput.addEventListener('drop', function (e) {
-  e.preventDefault();
-  urlInput.classList.remove('drag-over');
-  var droppedText = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain') || '';
-  droppedText = droppedText.trim();
-  if (droppedText && isValidUrl(droppedText)) {
-    urlInput.value = droppedText;
-    showUrlPreview(droppedText);
-    checkTrackingParams(droppedText);
-  }
-});
-
-// ============================================
-// INITIALIZATION
-// ============================================
-document.addEventListener('DOMContentLoaded', function () {
+// Init
+document.addEventListener('DOMContentLoaded', function() {
   initTheme();
   urlInput.focus();
-
-  // Clipboard detection after short delay
-  setTimeout(checkClipboard, 800);
+  setTimeout(checkClip, 800);
 });
