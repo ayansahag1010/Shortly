@@ -1,0 +1,95 @@
+⚡Shortly
+
+A modern frontend-only URL shortener web application built using HTML, CSS, and JavaScript.
+
+Shortly allows users to instantly convert long URLs into short links and generate QR codes for easy sharing, all directly in the browser without requiring any backend server.
+
+---
+
+🚀 Features
+
+* 🔗 Instant URL shortening using the TinyURL API
+* 📋 One-click copy to clipboard
+* 📱 Automatic QR code generation for shortened links
+* 💾 Option to download QR codes
+* ⚡ Fast and lightweight performance
+* 🎨 Clean and modern user interface
+* 📱 Fully responsive design for mobile and desktop
+
+---
+
+🛠 Tech Stack
+
+* HTML5
+* CSS3
+* Vanilla JavaScript
+* TinyURL API
+* QR Server API
+* Font Awesome Icons
+
+---
+
+📦 Project Structure
+
+Shortly/
+│
+├── index.html
+├── style.css
+├── app.js
+└── README.md
+
+
+---
+
+⚙️ How It Works
+
+1. The user enters a long URL into the input field.
+2. The application sends the URL to the TinyURL API.
+3. TinyURL returns a shortened version of the link.
+4. The shortened link is displayed on the screen.
+5. A QR code is generated automatically for quick sharing.
+6. Users can copy the link, open it, or download the QR code.
+
+---
+
+🌐 Running the Project
+
+To run the project locally:
+
+1. Download or clone the repository.
+2. Open the file: index.html
+
+The application will run directly in your browser.
+
+You can also deploy it using GitHub Pages.
+
+---
+
+📸 Screenshots
+
+
+
+---
+
+🔮 Future Improvements
+
+* 🌙 Dark mode support
+* 🔗 Bulk URL shortening
+* 🔍 URL preview detection
+* 🛡 Link safety verification
+* 🎨 Customizable QR codes
+
+---
+
+👨‍💻 Author
+
+G Ayan Kumar Saha
+
+GitHub
+[https://github.com/ayansahag1010](https://github.com/ayansahag1010)
+
+---
+
+📄 License
+
+This project is open-source and available under the MIT License.
