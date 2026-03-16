@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shortly — URL Shortener</title>
+  <meta name="description" content="Shorten long URLs instantly with QR code generation. Simple, fast, and free." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+  <div class="background-animation"></div>
+
+  <div class="wrap">
+    <!-- Header -->
+    <header class="sticky-header">
+      <div class="header-content">
+        <div class="logo">
+          <i class="fas fa-bolt logo-icon"></i>
+          <h1>Shortly</h1>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Create Section -->
+      <section class="create-section">
+        <div class="hero-card card">
+          <h2 class="section-title">
+            <i class="fas fa-link"></i>
+            Shorten Your URL
+          </h2>
+          <p class="section-subtitle">Paste a long URL and get a short, shareable link instantly</p>
+
+          <form id="shortenForm" class="shorten-form">
+            <div class="form-group">
+              <label for="urlInput">
+                <i class="fas fa-globe"></i>
+                Enter your long URL
+              </label>
+              <input
+                type="url"
+                id="urlInput"
+                placeholder="https://example.com/your-very-long-url-here"
+                required
+                autocomplete="off"
+              />
+            </div>
+            <button type="submit" class="submit-btn" id="submitBtn">
+              <i class="fas fa-magic"></i>
+              Shorten URL
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Result Section -->
+      <div id="result" class="hidden">
+        <div class="result-card card">
+          <div class="result-header">
+            <h3 class="success-title">
+              <i class="fas fa-check-circle"></i>
+              Link Created Successfully!
+            </h3>
+          </div>
+
+          <div class="result-content">
+            <div class="short-url-display">
+              <span class="label">Short URL:</span>
+              <a id="shortLink" class="short-url" target="_blank"></a>
+            </div>
+
+            <div class="action-buttons">
+              <button id="copyBtn" class="action-btn copy-btn">
+                <i class="fas fa-copy"></i>
+                Copy
+              </button>
+              <button id="openBtn" class="action-btn open-btn">
+                <i class="fas fa-external-link-alt"></i>
+                Open
+              </button>
+              <button id="qrBtn" class="action-btn qr-btn">
+                <i class="fas fa-qrcode"></i>
+                QR Code
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features Section -->
+      <section class="features-section">
+        <div class="features-grid">
+          <div class="feature-card card">
+            <div class="feature-icon">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <h4>Lightning Fast</h4>
+            <p>Shorten any URL in under a second with one click</p>
+          </div>
+
+          <div class="feature-card card">
+            <div class="feature-icon">
+              <i class="fas fa-qrcode"></i>
+            </div>
+            <h4>QR Code Generator</h4>
+            <p>Generate a scannable QR code for any shortened link</p>
+          </div>
+
+          <div class="feature-card card">
+            <div class="feature-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <h4>Simple & Reliable</h4>
+            <p>No sign-up needed — works right in your browser</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="main-footer">
+        <div class="footer-content">
+          <div class="footer-logo">
+            <i class="fas fa-bolt"></i>
+            <span>Shortly</span>
+          </div>
+          <p class="footer-text">Simple URL shortening with QR codes</p>
+          <p class="copyright">&copy; 2024 Shortly. All rights reserved.</p>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- QR Modal -->
+  <div id="qrModal" class="modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content card">
+      <button id="qrClose" class="modal-close">
+        <i class="fas fa-times"></i>
+      </button>
+      <h3 class="modal-title">
+        <i class="fas fa-qrcode"></i>
+        QR Code
+      </h3>
+      <div class="qr-display">
+        <img id="qrImg" alt="QR Code" />
+      </div>
+      <p id="qrUrl" class="qr-url"></p>
+      <button id="downloadQr" class="download-btn">
+        <i class="fas fa-download"></i>
+        Download QR Code
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
