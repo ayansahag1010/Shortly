@@ -1,15 +1,31 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shortly — URL Shortener</title>
-  <meta name="description" content="Shorten long URLs instantly with QR code generation. Simple, fast, and free." />
+  <title>Shortly — Smart URL Shortener</title>
+  <meta name="description" content="Shorten long URLs instantly with QR codes, safety checks, bulk shortening, and more." />
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
   <div class="background-animation"></div>
+
+  <!-- Drag & Drop Overlay -->
+  <div id="dropOverlay" class="drop-overlay">
+    <div class="drop-overlay-content">
+      <i class="fas fa-link"></i>
+      <p>Drop your URL here</p>
+    </div>
+  </div>
+
+  <!-- Clipboard Suggestion Popup -->
+  <div id="clipboardPopup" class="clipboard-popup hidden">
+    <i class="fas fa-clipboard"></i>
+    <span id="clipboardText">Paste URL from clipboard?</span>
+    <button id="clipboardAccept" class="clip-btn accept"><i class="fas fa-check"></i></button>
+    <button id="clipboardDismiss" class="clip-btn dismiss"><i class="fas fa-times"></i></button>
+  </div>
 
   <div class="wrap">
     <!-- Header -->
@@ -18,6 +34,11 @@
         <div class="logo">
           <i class="fas fa-bolt logo-icon"></i>
           <h1>Shortly</h1>
+        </div>
+        <div class="header-actions">
+          <button id="themeToggle" class="theme-toggle" title="Toggle dark mode">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
         </div>
       </div>
     </header>
@@ -32,6 +53,17 @@
           </h2>
           <p class="section-subtitle">Paste a long URL and get a short, shareable link instantly</p>
 
+          <!-- Mode Tabs: Single / Bulk -->
+          <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="single">
+              <i class="fas fa-link"></i> Single URL
+            </button>
+            <button class="mode-tab" data-mode="bulk">
+              <i class="fas fa-list"></i> Bulk URLs
+            </button>
+          </div>
+
+          <!-- Single URL Form -->
           <form id="shortenForm" class="shorten-form">
             <div class="form-group">
               <label for="urlInput">
@@ -46,15 +78,82 @@
                 autocomplete="off"
               />
             </div>
+
+            <!-- URL Preview Card (appears on platform detection) -->
+            <div id="urlPreview" class="url-preview hidden"></div>
+
+            <!-- URL Cleaning Options (appears when tracking params detected) -->
+            <div id="cleaningOptions" class="cleaning-options hidden">
+              <div class="cleaning-header">
+                <i class="fas fa-broom"></i>
+                <span>Tracking parameters detected!</span>
+              </div>
+              <div class="cleaning-choices">
+                <label class="clean-choice">
+                  <input type="radio" name="urlChoice" value="original" checked />
+                  <span>Use original URL</span>
+                </label>
+                <label class="clean-choice">
+                  <input type="radio" name="urlChoice" value="cleaned" />
+                  <span>Use cleaned URL <small id="cleanedPreview"></small></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Safety Warning (appears when suspicious URL detected) -->
+            <div id="safetyWarning" class="safety-warning hidden">
+              <div class="warning-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>This URL looks suspicious!</span>
+              </div>
+              <p id="safetyReason" class="warning-reason"></p>
+              <div class="warning-actions">
+                <button type="button" id="cancelShorten" class="warn-btn cancel">Cancel</button>
+                <button type="button" id="continueShorten" class="warn-btn continue">Continue Anyway</button>
+              </div>
+            </div>
+
             <button type="submit" class="submit-btn" id="submitBtn">
               <i class="fas fa-magic"></i>
               Shorten URL
             </button>
           </form>
+
+          <!-- Bulk URL Form (hidden by default) -->
+          <div id="bulkForm" class="bulk-form hidden">
+            <div class="form-group">
+              <label for="bulkInput">
+                <i class="fas fa-list"></i>
+                Paste multiple URLs (one per line)
+              </label>
+              <textarea
+                id="bulkInput"
+                placeholder="https://example1.com&#10;https://example2.com&#10;https://example3.com"
+                rows="5"
+              ></textarea>
+            </div>
+            <button type="button" id="bulkSubmitBtn" class="submit-btn">
+              <i class="fas fa-magic"></i>
+              Shorten All URLs
+            </button>
+          </div>
         </div>
       </section>
 
-      <!-- Result Section -->
+      <!-- Bulk Results (hidden by default) -->
+      <div id="bulkResults" class="hidden">
+        <div class="result-card card">
+          <div class="result-header">
+            <h3 class="success-title">
+              <i class="fas fa-check-circle"></i>
+              <span id="bulkCount">0</span> Links Created!
+            </h3>
+          </div>
+          <div id="bulkList" class="bulk-list"></div>
+        </div>
+      </div>
+
+      <!-- Single Result Section -->
       <div id="result" class="hidden">
         <div class="result-card card">
           <div class="result-header">
@@ -65,6 +164,11 @@
           </div>
 
           <div class="result-content">
+            <!-- Website Screenshot Preview -->
+            <div id="screenshotPreview" class="screenshot-preview">
+              <img id="screenshotImg" alt="Website Preview" onerror="this.parentElement.style.display='none'" />
+            </div>
+
             <div class="short-url-display">
               <span class="label">Short URL:</span>
               <a id="shortLink" class="short-url" target="_blank"></a>
@@ -72,17 +176,33 @@
 
             <div class="action-buttons">
               <button id="copyBtn" class="action-btn copy-btn">
-                <i class="fas fa-copy"></i>
-                Copy
+                <i class="fas fa-copy"></i> Copy
               </button>
               <button id="openBtn" class="action-btn open-btn">
-                <i class="fas fa-external-link-alt"></i>
-                Open
+                <i class="fas fa-external-link-alt"></i> Open
               </button>
               <button id="qrBtn" class="action-btn qr-btn">
-                <i class="fas fa-qrcode"></i>
-                QR Code
+                <i class="fas fa-qrcode"></i> QR Code
               </button>
+            </div>
+
+            <!-- Social Share Buttons -->
+            <div class="social-share">
+              <span class="share-label">Share to:</span>
+              <div class="share-buttons">
+                <button id="shareWhatsApp" class="share-btn whatsapp" title="WhatsApp">
+                  <i class="fab fa-whatsapp"></i>
+                </button>
+                <button id="shareTwitter" class="share-btn twitter" title="Twitter / X">
+                  <i class="fab fa-x-twitter"></i>
+                </button>
+                <button id="shareTelegram" class="share-btn telegram" title="Telegram">
+                  <i class="fab fa-telegram-plane"></i>
+                </button>
+                <button id="shareLinkedIn" class="share-btn linkedin" title="LinkedIn">
+                  <i class="fab fa-linkedin-in"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -92,27 +212,34 @@
       <section class="features-section">
         <div class="features-grid">
           <div class="feature-card card">
-            <div class="feature-icon">
-              <i class="fas fa-bolt"></i>
-            </div>
+            <div class="feature-icon"><i class="fas fa-bolt"></i></div>
             <h4>Lightning Fast</h4>
             <p>Shorten any URL in under a second with one click</p>
           </div>
-
           <div class="feature-card card">
-            <div class="feature-icon">
-              <i class="fas fa-qrcode"></i>
-            </div>
-            <h4>QR Code Generator</h4>
-            <p>Generate a scannable QR code for any shortened link</p>
+            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+            <h4>Safety Check</h4>
+            <p>URLs are scanned for phishing and malware before shortening</p>
           </div>
-
           <div class="feature-card card">
-            <div class="feature-icon">
-              <i class="fas fa-shield-alt"></i>
-            </div>
-            <h4>Simple & Reliable</h4>
-            <p>No sign-up needed — works right in your browser</p>
+            <div class="feature-icon"><i class="fas fa-palette"></i></div>
+            <h4>Custom QR Codes</h4>
+            <p>Generate QR codes with custom colors and sizes</p>
+          </div>
+          <div class="feature-card card">
+            <div class="feature-icon"><i class="fas fa-list"></i></div>
+            <h4>Bulk Shortener</h4>
+            <p>Shorten multiple URLs at once with a single click</p>
+          </div>
+          <div class="feature-card card">
+            <div class="feature-icon"><i class="fas fa-broom"></i></div>
+            <h4>URL Cleaning</h4>
+            <p>Remove tracking parameters for cleaner, private links</p>
+          </div>
+          <div class="feature-card card">
+            <div class="feature-icon"><i class="fas fa-moon"></i></div>
+            <h4>Dark Mode</h4>
+            <p>Easy on the eyes with a beautiful dark theme</p>
           </div>
         </div>
       </section>
@@ -124,7 +251,7 @@
             <i class="fas fa-bolt"></i>
             <span>Shortly</span>
           </div>
-          <p class="footer-text">Simple URL shortening with QR codes</p>
+          <p class="footer-text">Smart URL shortening with safety checks, QR codes & more</p>
           <p class="copyright">&copy; 2024 Shortly. All rights reserved.</p>
         </div>
       </footer>
@@ -146,6 +273,23 @@
         <img id="qrImg" alt="QR Code" />
       </div>
       <p id="qrUrl" class="qr-url"></p>
+
+      <!-- QR Customization Controls -->
+      <div class="qr-customize">
+        <div class="qr-control">
+          <label for="qrColor">QR Color</label>
+          <input type="color" id="qrColor" value="#2563EB" />
+        </div>
+        <div class="qr-control">
+          <label for="qrBg">Background</label>
+          <input type="color" id="qrBg" value="#FFFFFF" />
+        </div>
+        <div class="qr-control">
+          <label for="qrSize">Size: <span id="qrSizeLabel">250</span>px</label>
+          <input type="range" id="qrSize" min="100" max="500" value="250" step="10" />
+        </div>
+      </div>
+
       <button id="downloadQr" class="download-btn">
         <i class="fas fa-download"></i>
         Download QR Code
