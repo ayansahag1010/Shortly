@@ -80,13 +80,18 @@ Shortly/
 
 ---
 
-## 🔮 Future Improvements
+## 🔮 Future Improvements & Shortly 2.0
 
-- 📊 Click analytics dashboard
-- 🔒 Password-protected short links
-- 📝 Custom alias support (e.g., `short.ly/my-link`)
-- 🕓 Link expiration timers
-- 📂 Export shortened links as CSV
+Shortly 2.0 has been implemented as a complete enterprise-grade full-stack edition located in the [`Shortly-2.0/`](./Shortly-2.0) directory!
+
+- 📊 **Real-Time Click Analytics & Dashboard** (Live counter, top-performing links, click logs)
+- 📝 **Custom Aliases / Slugs** (e.g., `short.ly/my-cool-link`)
+- 🕓 **Link Expiration Timers** (1-day, 7-day, 30-day, or permanent links)
+- 🔒 **User Authentication & Private Dashboards** (JWT + Spring Security)
+- 🎨 **Dynamic QR Code Studio** (Custom resolution, colors, and live PNG download)
+- ☕ **Spring Boot 3 + React 19 + MySQL/H2 Architecture** (Base62 encoding, REST API)
+
+Check out [`Shortly-2.0/README.md`](./Shortly-2.0/README.md) for full setup instructions, API documentation, and architecture diagrams.
 
 ---
 
