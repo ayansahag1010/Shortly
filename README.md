@@ -28,12 +28,12 @@
 
 ---
 
-## 🌐 Live Demo
+## 🌐 Live Demo & Deployment
 
-| Version | Deployment | Description | Action |
+| Version | Live Hosting | Description | Link |
 | :--- | :--- | :--- | :--- |
-| **Shortly 1.0 (Client-Side)** | **GitHub Pages** | Pure browser-based shortener with TinyURL, QR generator, Safety scanner, and tracker cleaner. Zero setup needed. | [**🚀 Open Live Demo**](https://ayansahag1010.github.io/Shortly/) |
-| **Shortly 2.0 (Full-Stack)** | **Local / Container** | Enterprise full-stack edition with Spring Boot 3, React 19, JWT authentication, real-time analytics, and custom Base62 engine. | [**📖 Explore Shortly 2.0**](./Shortly-2.0) |
+| **Shortly 2.0 (React 19 SPA)** | **GitHub Pages** (Automated CI/CD) | Full interactive React 19 frontend with Glassmorphism UI, QR Code Studio, Theme Switcher, and Analytics Dashboard. | [**🚀 Open Live Application**](https://ayansahag1010.github.io/Shortly/) |
+| **Shortly 2.0 (Full-Stack)** | **Local / Self-Hosted** | Complete Spring Boot 3 + MySQL/H2 backend with Base62 shortener, JWT security, and click tracking. | [**📖 Setup Guide**](./Shortly-2.0) |
 
 ---
 
