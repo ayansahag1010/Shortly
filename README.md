@@ -4,7 +4,6 @@
 
 ### Modern, High-Performance URL Shortener & Link Management Ecosystem
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-0D9488?style=for-the-badge&logo=githubpages&logoColor=white)](https://ayansahag1010.github.io/Shortly/)
 [![React](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-17%20%2F%2021-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
@@ -13,7 +12,6 @@
 <br />
 
 <p align="center">
-  <a href="#-live-demo">Live Demo</a> •
   <a href="#-editions-overview">Editions</a> •
   <a href="#-key-features">Key Features</a> •
   <a href="#-tech-stack">Tech Stack</a> •
@@ -25,15 +23,6 @@
 <img src="assets/preview.png" alt="Shortly Preview" width="850" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
 
 </div>
-
----
-
-## 🌐 Live Demo & Deployment
-
-| Version | Live Hosting | Description | Link |
-| :--- | :--- | :--- | :--- |
-| **Shortly 2.0 (React 19 SPA)** | **GitHub Pages** (Automated CI/CD) | Full interactive React 19 frontend with Glassmorphism UI, QR Code Studio, Theme Switcher, and Analytics Dashboard. | [**🚀 Open Live Application**](https://ayansahag1010.github.io/Shortly/) |
-| **Shortly 2.0 (Full-Stack)** | **Local / Self-Hosted** | Complete Spring Boot 3 + MySQL/H2 backend with Base62 shortener, JWT security, and click tracking. | [**📖 Setup Guide**](./Shortly-2.0) |
 
 ---
 
