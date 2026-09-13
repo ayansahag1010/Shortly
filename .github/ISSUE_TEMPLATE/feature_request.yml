@@ -1,0 +1,32 @@
+name: 💡 Feature Request
+description: Suggest an idea or new capability for Shortly
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea to make Shortly even better? Let us know!
+  - type: dropdown
+    id: edition
+    attributes:
+      label: Which edition is this suggestion for?
+      options:
+        - Shortly 1.0 (Client-side HTML/JS)
+        - Shortly 2.0 (React 19 + Spring Boot 3)
+        - General / Both
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: A clear and concise description of the feature or improvement.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Use Case
+      description: What problem does this solve, or why would this feature be valuable?
+    validations:
+      required: false
